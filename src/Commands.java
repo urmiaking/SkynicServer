@@ -7,7 +7,6 @@ public class Commands {
         commands.add("AT+GETALL");
         commands.add("AT+SETVAL");
         commands.add("AT+PASS");
-        commands.add("AT+GETALL");
         commands.add("AT+DEL");
         commands.add("AT+REN");
         commands.add("AT+DELALL");
@@ -19,10 +18,6 @@ public class Commands {
                 return true;
             }
         }
-        return false;
-    }
-
-    public boolean isOkPassword(String password) {
         return false;
     }
 }
