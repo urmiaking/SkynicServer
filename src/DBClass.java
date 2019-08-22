@@ -14,36 +14,71 @@ public class DBClass {
 
     public static void createDB() {
         try {
-            Connection myConn = DriverManager.getConnection(url, user, password);
+            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'my_scheme'";
             ResultSet rs = myStmt.executeQuery(sql);
             if (!rs.next()) {
-                Statement createStmt = myConn.createStatement();
-                String createSql = "CREATE DATABASE `my_db`;" +
-                        "" +
-                        "CREATE TABLE `tbl_hub` (" +
-                        "  `id` int(11) NOT NULL AUTO_INCREMENT," +
-                        "  `serial` varchar(45) NOT NULL," +
-                        "  `isOnline` int(11) DEFAULT NULL," +
-                        "  `clientNumbers` int(11) DEFAULT NULL," +
-                        "  `clientName` varchar(45) DEFAULT NULL," +
-                        "  `phone` varchar(15) DEFAULT NULL," +
-                        "  PRIMARY KEY (`id`)," +
-                        "  UNIQUE KEY `serial_UNIQUE` (`serial`)" +
-                        ") ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
-                        "" +
-                        "CREATE TABLE `tbl_phone` (" +
-                        "  `ipaddress` varchar(45) NOT NULL," +
-                        "  `serial` varchar(45) NOT NULL," +
-                        "  `password` varchar(45) NOT NULL," +
-                        "  `time` varchar(45) NOT NULL," +
-                        "  PRIMARY KEY (`ipaddress`,`serial`)" +
-                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
-                createStmt.executeUpdate(createSql);
+                Statement createDBStmt = myConn.createStatement();
+                String createDBSql = "CREATE DATABASE `my_scheme`;";
+                createDBStmt.executeUpdate(createDBSql);
                 System.out.println("Database Created Successfully");
+
+                Statement createHubStmt = myConn.createStatement();
+                String createHubSql =
+                        "CREATE TABLE my_scheme.tbl_hub ("+
+                        "id int(11) NOT NULL AUTO_INCREMENT," +
+                        "serial varchar(45) NOT NULL," +
+                        "isOnline int(11) DEFAULT NULL," +
+                        "clientNumbers int(11) DEFAULT NULL," +
+                        "clientName varchar(45) DEFAULT NULL," +
+                        "phone varchar(15) DEFAULT NULL," +
+                        "PRIMARY KEY (id)," +
+                        "UNIQUE KEY serial_UNIQUE (serial)" +
+                        ") ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                createHubStmt.executeUpdate(createHubSql);
+                System.out.println("tbl_hub Created Successfully");
+
+                Statement createPhoneStmt = myConn.createStatement();
+                String createPhoneSql =
+                        "CREATE TABLE my_scheme.tbl_phone (" +
+                        "  ipaddress varchar(45) NOT NULL," +
+                        "  serial varchar(45) NOT NULL," +
+                        "  password varchar(45) NOT NULL," +
+                        "  time varchar(45) NOT NULL," +
+                        "  PRIMARY KEY (ipaddress,serial)" +
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                createPhoneStmt.executeUpdate(createPhoneSql);
+                System.out.println("tbl_phone Created Successfully");
+
+                Statement createUserStmt = myConn.createStatement();
+                String createUserSql =
+                        "CREATE TABLE my_scheme.tbl_user ( " +
+                        "  id int(11) NOT NULL AUTO_INCREMENT," +
+                        "  name varchar(80) NOT NULL," +
+                        "  email varchar(45) NOT NULL," +
+                        "  password varchar(200) NOT NULL," +
+                        "  active varchar(10) NOT NULL," +
+                        "  PRIMARY KEY (id)," +
+                        "  UNIQUE KEY email_UNIQUE (email)" +
+                        ") ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='for login and registereation';";
+                createUserStmt.executeUpdate(createUserSql);
+                System.out.println("tbl_user Created Successfully");
+
+                String addAdminUser = " insert into my_scheme.tbl_user (name, email, password, active)"
+                        + " values (?, ?, ?, ?)";
+
+                PreparedStatement preparedStmt = myConn.prepareStatement(addAdminUser);
+                preparedStmt.setString (1, "admin");
+                preparedStmt.setString (2, "admin@admin.com");
+                preparedStmt.setString (3, "admin");
+                preparedStmt.setString (4, "true");
+                preparedStmt.execute();
+                myConn.close();
+                System.out.println("admin User Created Successfully: email: admin@admin.com , password: admin");
             }
             else {
+                myConn.close();
                 System.out.println("Database Exists. Initiating Connection...");
             }
         } catch (SQLException e) {
@@ -58,9 +93,11 @@ public class DBClass {
             String sql = "Select * from my_scheme.tbl_hub where serial="+id;
             ResultSet rs = myStmt.executeQuery(sql);
             if (!rs.next()) {
+                myConn.close();
                 return false;
             }
             else {
+                myConn.close();
                 return true;
             }
         } catch (SQLException e) {
