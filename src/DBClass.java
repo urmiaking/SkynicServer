@@ -12,6 +12,45 @@ public class DBClass {
         this.id = id;
     }
 
+    public static void createDB() {
+        try {
+            Connection myConn = DriverManager.getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+            String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'my_scheme'";
+            ResultSet rs = myStmt.executeQuery(sql);
+            if (!rs.next()) {
+                Statement createStmt = myConn.createStatement();
+                String createSql = "CREATE DATABASE `my_db`;" +
+                        "" +
+                        "CREATE TABLE `tbl_hub` (" +
+                        "  `id` int(11) NOT NULL AUTO_INCREMENT," +
+                        "  `serial` varchar(45) NOT NULL," +
+                        "  `isOnline` int(11) DEFAULT NULL," +
+                        "  `clientNumbers` int(11) DEFAULT NULL," +
+                        "  `clientName` varchar(45) DEFAULT NULL," +
+                        "  `phone` varchar(15) DEFAULT NULL," +
+                        "  PRIMARY KEY (`id`)," +
+                        "  UNIQUE KEY `serial_UNIQUE` (`serial`)" +
+                        ") ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;" +
+                        "" +
+                        "CREATE TABLE `tbl_phone` (" +
+                        "  `ipaddress` varchar(45) NOT NULL," +
+                        "  `serial` varchar(45) NOT NULL," +
+                        "  `password` varchar(45) NOT NULL," +
+                        "  `time` varchar(45) NOT NULL," +
+                        "  PRIMARY KEY (`ipaddress`,`serial`)" +
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                createStmt.executeUpdate(createSql);
+                System.out.println("Database Created Successfully");
+            }
+            else {
+                System.out.println("Database Exists. Initiating Connection...");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public boolean isRegistered() {
         try {
             Connection myConn = DriverManager.getConnection(url, user, password);

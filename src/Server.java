@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public class Server {
     public static void main(String[] args) {
         try {
+            DBClass.createDB();
             DBClass.purgeHubs();
             ServerSocket serverSocket = new ServerSocket(9898);
             System.out.println("Server Running!");
