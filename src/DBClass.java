@@ -14,6 +14,7 @@ public class DBClass {
 
     public static void createDB() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'my_scheme'";
@@ -83,11 +84,14 @@ public class DBClass {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     public boolean isRegistered() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "Select * from my_scheme.tbl_hub where serial="+id;
@@ -103,11 +107,19 @@ public class DBClass {
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
     public void setOnline() {
         try {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET isOnline=1 WHERE serial="+id;
@@ -119,28 +131,35 @@ public class DBClass {
 
     public void setOffline() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET isOnline=0 WHERE serial="+id;
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     public void setClientNumbers(int number) {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET clientNumbers="+number+" WHERE serial="+id;
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     public int getClientNumbers() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             int serial = 0;
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
@@ -153,11 +172,15 @@ public class DBClass {
         } catch (SQLException e) {
             e.printStackTrace();
             return 0;
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 
     public void addOrUpdatePhone(String ipAddress, String passcode, String serial, String time) {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT * from my_scheme.tbl_phone where ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
@@ -181,16 +204,21 @@ public class DBClass {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
     public static void purgeHubs() {
         try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET isOnline = 0, clientNumbers = 0";
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
