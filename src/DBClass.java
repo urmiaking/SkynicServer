@@ -1,12 +1,27 @@
+import java.io.IOException;
 import java.sql.*;
 
 @SuppressWarnings("ALL")
 public class DBClass {
 
     private String id;
-    private static String url = "jdbc:mysql://localhost:3306/my_scheme?useSSL=false";
-    private static String user = "root";
-    private static String password = "root";
+    private static String url;
+    private static String user;
+    private static String password;
+    private static String connectionStringWithoutDb;
+    private static String mySqlDriver;
+
+    static {
+        try {
+            url = PropertyFile.getConnectionString();
+            user = PropertyFile.getdbUserName();
+            password = PropertyFile.getdbPassword();
+            connectionStringWithoutDb = PropertyFile.getConnectionStrinWithoutDb();
+            mySqlDriver = PropertyFile.getMySqlDriver();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public DBClass(String id) {
         this.id = id;
@@ -14,8 +29,8 @@ public class DBClass {
 
     public static void createDB() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306?useSSL=false", user, password);
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(connectionStringWithoutDb, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'my_scheme'";
             ResultSet rs = myStmt.executeQuery(sql);
@@ -91,7 +106,7 @@ public class DBClass {
 
     public boolean isRegistered() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "Select * from my_scheme.tbl_hub where serial="+id;
@@ -116,7 +131,7 @@ public class DBClass {
     public void setOnline() {
         try {
             try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
+                Class.forName(mySqlDriver);
             } catch (ClassNotFoundException e) {
                 e.printStackTrace();
             }
@@ -131,7 +146,7 @@ public class DBClass {
 
     public void setOffline() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET isOnline=0 WHERE serial="+id;
@@ -145,7 +160,7 @@ public class DBClass {
 
     public void setClientNumbers(int number) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET clientNumbers="+number+" WHERE serial="+id;
@@ -159,7 +174,7 @@ public class DBClass {
 
     public int getClientNumbers() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             int serial = 0;
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
@@ -180,7 +195,7 @@ public class DBClass {
 
     public void addOrUpdatePhone(String ipAddress, String passcode, String serial, String time) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT * from my_scheme.tbl_phone where ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
@@ -211,7 +226,7 @@ public class DBClass {
 
     public static void purgeHubs() {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "UPDATE my_scheme.tbl_hub SET isOnline = 0, clientNumbers = 0";
@@ -225,7 +240,7 @@ public class DBClass {
 
     public void updatePassword(String ipAddress, String newPassword, String serial) {
         try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
+            Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT * from my_scheme.tbl_phone where ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
