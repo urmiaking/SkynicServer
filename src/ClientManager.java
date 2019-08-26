@@ -32,8 +32,8 @@ public class  ClientManager {
             else {
                 String[] idAndIdentity = identity.split("=");
                 if (!(idAndIdentity.length < 2 || idAndIdentity.length > 2)) {
-                    identity = idAndIdentity[0];
-                    id = idAndIdentity[1];
+                    identity = idAndIdentity[0]; //AT+PHONE or AT+HUB
+                    id = idAndIdentity[1]; //serial number of HUB
                     System.out.println("Identity & ID Received from Socket " + socket.getPort() + ": " + identity + " " + id);
                 }
             }

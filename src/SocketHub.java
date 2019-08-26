@@ -112,6 +112,25 @@ public class SocketHub implements Runnable {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                } else if (line.equals("NEW PASS OK")) {
+                    try {
+                        synchronized (socketPhoneQueue) {
+                            socketPhone = socketPhoneQueue.poll();
+                            if (socketPhone != null) {
+                                socketPhone.getSocket().getOutputStream().write((line + "\r\n").getBytes());
+                                String temp = socketPhone.getSocket().getInetAddress().toString();
+                                StringBuilder sb = new StringBuilder(temp);
+                                sb.deleteCharAt(0);
+                                String ipAddress = sb.toString();
+                                String newPassword = socketPhone.getPass();
+                                String serial = socketPhone.getSerial();
+
+                                dbClass.updatePassword(ipAddress,newPassword,serial);
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                 }
                 else {
                     if (socketPhonesArrays != null) {

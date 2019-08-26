@@ -222,4 +222,27 @@ public class DBClass {
             e.printStackTrace();
         }
     }
+
+    public void updatePassword(String ipAddress, String newPassword, String serial) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection myConn = DriverManager.getConnection(url, user, password);
+            Statement myStmt = myConn.createStatement();
+            String sql = "SELECT * from my_scheme.tbl_phone where ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
+            ResultSet result = myStmt.executeQuery(sql);
+            if (result.next()) {
+                Statement myStmtUpdate = myConn.createStatement();
+                String sqlUpdate = "UPDATE my_scheme.tbl_phone SET password='" + newPassword + "' WHERE ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
+                myStmtUpdate.executeUpdate(sqlUpdate);
+                myConn.close();
+            } else {
+                System.out.println("Update Password Failed");
+                myConn.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 }

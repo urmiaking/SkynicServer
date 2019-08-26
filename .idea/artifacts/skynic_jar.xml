@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
-  <artifact type="jar" name="finaltest4:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/finaltest4_jar</output-path>
+  <artifact type="jar" name="skynic:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/skynic_jar</output-path>
     <root id="archive" name="finaltest4.jar">
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/src/main/resources/META-INF/MANIFEST.MF" />

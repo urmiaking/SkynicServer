@@ -54,6 +54,13 @@ public class SocketPhone implements Runnable {
                     break;
                 } else {
                     if (cmdList.isValidCommand(line)) {
+                        if (line.startsWith("AT+NEWPASS")) {
+                            String[] passPhrase = line.split("=");
+                            if (!(passPhrase.length < 2 || passPhrase.length > 2)) {
+                                String passcode = passPhrase[1];
+                                this.setPass(passcode);
+                            }
+                        }
                         socketHub.write((line + "\r\n"), this);
                         System.out.println("Message From Phone " + socketPhone.getPort() + " To Hub " + socketHub.getSocketHub().getPort() + " : " + line);
                     }
