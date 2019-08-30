@@ -42,6 +42,10 @@ public class SocketHub implements Runnable {
 
     @Override
     public void run() {
+        String tempIp = this.socketHub.getInetAddress().toString();
+        StringBuilder sb = new StringBuilder(tempIp);
+        sb.deleteCharAt(0);
+        String ipAddress = sb.toString();
         DBClass dbClass = new DBClass(this.getId());
         while (true) {
             String line = readLine(); //chizie ke hub az vorodi khodesh mikhone mifreste be phone
@@ -52,6 +56,7 @@ public class SocketHub implements Runnable {
                     ClientManager.getInstance().socketHubs.remove(this);
                     dbClass.setOffline();
                     dbClass.setClientNumbers(0);
+                    dbClass.logSocketHubClosed(ipAddress, id, this.socketPhone.getPass());
                     if (socketPhonesArrays != null) {
                         for (SocketPhone socketPhone : socketPhonesArrays) {
                             socketPhone.getSocket().getOutputStream().write("Hub Disconnected! Disconnecting...\r\n".getBytes());
@@ -88,6 +93,7 @@ public class SocketHub implements Runnable {
                                 socketPhone.getSocket().getOutputStream().write((line + "\r\n").getBytes());
                                 socketPhone.getSocket().close();
                                 System.out.println("HUB " + socketHub.getPort()+ " : Wrong Password Sent by Client " + socketPhone.getSocket().getPort());
+                                dbClass.logPassError(ipAddress, id, this.socketPhone.getPass());
                             }
                         }
                     } catch (IOException e) {
@@ -99,14 +105,10 @@ public class SocketHub implements Runnable {
                             socketPhone = socketPhoneQueue.poll();
                             if (socketPhone != null) {
                                 socketPhone.getSocket().getOutputStream().write((line + "\r\n").getBytes());
-                                String temp = socketPhone.getSocket().getInetAddress().toString();
-                                StringBuilder sb = new StringBuilder(temp);
-                                sb.deleteCharAt(0);
-                                String ipAddress = sb.toString();
                                 String passCode = socketPhone.getPass();
                                 String serial = socketPhone.getSerial();
-                                String time = LocalDateTime.now().toString();
-                                dbClass.addOrUpdatePhone(ipAddress,passCode,serial,time);
+                                dbClass.addPhone(ipAddress,passCode,serial);
+                                dbClass.logPhoneConnected(ipAddress, passCode, serial);
                             }
                         }
                     } catch (IOException e) {
@@ -118,14 +120,10 @@ public class SocketHub implements Runnable {
                             socketPhone = socketPhoneQueue.poll();
                             if (socketPhone != null) {
                                 socketPhone.getSocket().getOutputStream().write((line + "\r\n").getBytes());
-                                String temp = socketPhone.getSocket().getInetAddress().toString();
-                                StringBuilder sb = new StringBuilder(temp);
-                                sb.deleteCharAt(0);
-                                String ipAddress = sb.toString();
                                 String newPassword = socketPhone.getPass();
                                 String serial = socketPhone.getSerial();
-
                                 dbClass.updatePassword(ipAddress,newPassword,serial);
+                                dbClass.logPasswordUpdated(ipAddress, serial, newPassword);
                             }
                         }
                     } catch (IOException e) {

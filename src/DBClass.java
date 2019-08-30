@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.sql.*;
+import java.time.LocalDateTime;
 
 @SuppressWarnings("ALL")
 public class DBClass {
@@ -51,7 +52,7 @@ public class DBClass {
                         "phone varchar(15) DEFAULT NULL," +
                         "PRIMARY KEY (id)," +
                         "UNIQUE KEY serial_UNIQUE (serial)" +
-                        ") ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
                 createHubStmt.executeUpdate(createHubSql);
                 System.out.println("tbl_hub Created Successfully");
 
@@ -61,11 +62,25 @@ public class DBClass {
                         "  ipaddress varchar(45) NOT NULL," +
                         "  serial varchar(45) NOT NULL," +
                         "  password varchar(45) NOT NULL," +
-                        "  time varchar(45) NOT NULL," +
                         "  PRIMARY KEY (ipaddress,serial)" +
-                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;";
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
                 createPhoneStmt.executeUpdate(createPhoneSql);
                 System.out.println("tbl_phone Created Successfully");
+
+                Statement createLogStmt = myConn.createStatement();
+                String createLogSql =
+                        "CREATE TABLE my_scheme.tbl_log (" +
+                                "  id int(11) NOT NULL AUTO_INCREMENT," +
+                                "  ipaddress varchar(45) NOT NULL," +
+                                "  serial varchar(45) DEFAULT NULL," +
+                                "  password varchar(45) DEFAULT NULL," +
+                                "  time varchar(45) DEFAULT NULL," +
+                                "  status varchar(45) DEFAULT NULL," +
+                                "  description varchar(200) DEFAULT NULL,"+
+                                "  PRIMARY KEY (id)" +
+                                ") ENGINE=InnoDB DEFAULT CHARSET=utf8;";
+                createLogStmt.executeUpdate(createLogSql);
+                System.out.println("tbl_log Created Successfully");
 
                 Statement createUserStmt = myConn.createStatement();
                 String createUserSql =
@@ -77,7 +92,7 @@ public class DBClass {
                         "  active varchar(10) NOT NULL," +
                         "  PRIMARY KEY (id)," +
                         "  UNIQUE KEY email_UNIQUE (email)" +
-                        ") ENGINE=InnoDB AUTO_INCREMENT=39 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='for login and registereation';";
+                        ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='for login and registereation';";
                 createUserStmt.executeUpdate(createUserSql);
                 System.out.println("tbl_user Created Successfully");
 
@@ -91,7 +106,7 @@ public class DBClass {
                 preparedStmt.setString (4, "true");
                 preparedStmt.execute();
                 myConn.close();
-                System.out.println("admin User Created Successfully: email: admin@admin.com , password: admin");
+                System.out.println("Admin User Created Successfully: email: admin@admin.com , password: admin");
             }
             else {
                 myConn.close();
@@ -193,27 +208,20 @@ public class DBClass {
         }
     }
 
-    public void addOrUpdatePhone(String ipAddress, String passcode, String serial, String time) {
+    public void addPhone(String ipAddress, String passcode, String serial) {
         try {
             Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
             String sql = "SELECT * from my_scheme.tbl_phone where ipaddress='" + ipAddress + "' AND serial='" + serial + "'";
             ResultSet result = myStmt.executeQuery(sql);
-            if (result.next()) {
-                Statement myStmtUpdate = myConn.createStatement();
-                String sqlUpdate = "UPDATE my_scheme.tbl_phone SET time='" + time + "' WHERE ipaddress='" + ipAddress + "'";
-                myStmtUpdate.executeUpdate(sqlUpdate);
-                myConn.close();
-            } else {
-                String query = " insert into my_scheme.tbl_phone (ipaddress, serial, password, time)"
-                        + " values (?, ?, ?, ?)";
-
+            if (!result.next()) {
+                String query = " insert into my_scheme.tbl_phone (ipaddress, serial, password)"
+                        + " values (?, ?, ?)";
                 PreparedStatement preparedStmt = myConn.prepareStatement(query);
                 preparedStmt.setString (1, ipAddress);
                 preparedStmt.setString (2, serial);
                 preparedStmt.setString (3, passcode);
-                preparedStmt.setString (4, time);
                 preparedStmt.execute();
                 myConn.close();
             }
@@ -254,6 +262,285 @@ public class DBClass {
                 System.out.println("Update Password Failed");
                 myConn.close();
             }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void logFirstTimeOut(String ipAddress) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, status, description, time)"
+                    + " values (?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, "Disconnected - First TimeOut");
+            preparedStmt.setString (3, "Socket Closed Due To Not Sending His Identity And Got Into TimeOut or Disconnected By Himself Before TimeOut Arrives");
+            preparedStmt.setString (4, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logHubAlreadyOnline(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Hub Already Online");
+            preparedStmt.setString (4, "Socket Closed Because It tried to connect as a hub which is already online");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logHubNotAvailable(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Hub Serial is Invalid");
+            preparedStmt.setString (4, "Socket Closed Because It tried to connect as a hub which is not available in Database");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logSecondTimeOut(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Second TimeOut");
+            preparedStmt.setString (4, "Socket Closed Because It Does not send password and timed out or it closed it socket before entering password");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logInvalidCommand(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Invalid Command");
+            preparedStmt.setString (4, "Socket Closed Because It Send invalid command");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logHubIsOffline(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Hub Offline");
+            preparedStmt.setString (4, "Socket Closed Because It Tries to connect to a hub which is offline");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logRequestedHubNotAvailable(String ipAddress, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time)"
+                    + " values (?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Hub Serial is Invalid");
+            preparedStmt.setString (4, "Socket Closed Because It tried to connect to a hub which is not available in Database");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logPhoneConnected(String ipAddress, String passCode, String serial) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time, password)"
+                    + " values (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Connected");
+            preparedStmt.setString (4, "Socket Phone Successfully Connected to Hub");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.setString (6, passCode);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logSocketPhoneClosed(String ipAddress, String serial, String pass) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time, password)"
+                    + " values (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Socket Phone Disconnected");
+            preparedStmt.setString (4, "Socket Phone Disconnected with any reason (e.g. by itself, by hub, by connection failure, pass error etc)");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.setString (6, pass);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logPasswordUpdated(String ipAddress, String serial, String newPassword) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time, password)"
+                    + " values (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Connected - Password Changed");
+            preparedStmt.setString (4, "Socket Phone Successfully Changed Hub "+ serial +" Password");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.setString (6, newPassword);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logSocketHubClosed(String ipAddress, String serial, String pass) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time, password)"
+                    + " values (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - Socket HUB Disconnected");
+            preparedStmt.setString (4, "Socket HUB Disconnected  by itself or by connection failure");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.setString (6, pass);
+            preparedStmt.execute();
+            myConn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void logPassError(String ipAddress, String serial, String pass) {
+        try {
+            Class.forName(mySqlDriver);
+            Connection myConn = DriverManager.getConnection(url, user, password);
+
+            String timeDate = LocalDateTime.now().toString();
+            String query = " insert into my_scheme.tbl_log (ipaddress, serial, status, description, time, password)"
+                    + " values (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStmt = myConn.prepareStatement(query);
+            preparedStmt.setString (1, ipAddress);
+            preparedStmt.setString (2, serial);
+            preparedStmt.setString (3, "Disconnected - invalid password");
+            preparedStmt.setString (4, "Socket Phone Sent Invalid Password");
+            preparedStmt.setString (5, timeDate);
+            preparedStmt.setString (6, pass);
+            preparedStmt.execute();
+            myConn.close();
         } catch (SQLException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

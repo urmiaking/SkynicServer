@@ -13,6 +13,7 @@ public class SocketPhone implements Runnable {
     private String pass;
     private String serial;
     private Commands cmdList = new Commands();
+    private DBClass dbClass;
 
     public void setPass(String pass) {
         this.pass = pass;
@@ -24,6 +25,7 @@ public class SocketPhone implements Runnable {
 
     public void setSerial(String serial) {
         this.serial = serial;
+        dbClass = new DBClass(serial);
     }
 
     public String getSerial() {
@@ -42,6 +44,10 @@ public class SocketPhone implements Runnable {
 
     @Override
     public void run() {
+        String temp = this.getSocket().getInetAddress().toString();
+        StringBuilder sb = new StringBuilder(temp);
+        sb.deleteCharAt(0);
+        String ipAddress = sb.toString();
         while (true) {
             try {
                 line = readLine(); //chizie ke client mifreste
@@ -51,6 +57,7 @@ public class SocketPhone implements Runnable {
                     System.out.println("Socket Phone " + socketPhone.getPort() + " Closed");
                     System.out.println("=====================================");
                     ClientManager.getInstance().dbClass.setClientNumbers(socketHub.socketPhonesArrays.size());
+                    dbClass.logSocketPhoneClosed(ipAddress, serial, pass);
                     break;
                 } else {
                     if (cmdList.isValidCommand(line)) {
@@ -66,6 +73,8 @@ public class SocketPhone implements Runnable {
                     }
                     else {
                         socketPhone.getOutputStream().write("Invalid Command...\r\n".getBytes());
+                        socketPhone.close();
+                        dbClass.logInvalidCommand(ipAddress, serial);
                     }
                 }
                 Thread.sleep(100);

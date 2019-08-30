@@ -1121,145 +1121,175 @@
       <Charset>utf8mb4</Charset>
       <DefaultForCharset>0</DefaultForCharset>
     </collation>
-    <table id="282" parent="4" name="tbl_hub"/>
-    <table id="283" parent="4" name="tbl_phone"/>
-    <table id="284" parent="4" name="tbl_user">
-      <Comment>for login and registereation</Comment>
+    <table id="282" parent="4" name="tbl_hub">
+      <Collation>utf8_general_ci</Collation>
     </table>
-    <column id="285" parent="282" name="id">
+    <table id="283" parent="4" name="tbl_log">
+      <Collation>utf8_general_ci</Collation>
+    </table>
+    <table id="284" parent="4" name="tbl_phone">
+      <Collation>utf8_general_ci</Collation>
+    </table>
+    <table id="285" parent="4" name="tbl_user">
+      <Comment>for login and registereation</Comment>
+      <Collation>utf8_general_ci</Collation>
+    </table>
+    <column id="286" parent="282" name="id">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="286" parent="282" name="serial">
+    <column id="287" parent="282" name="serial">
       <Position>2</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="287" parent="282" name="isOnline">
+    <column id="288" parent="282" name="isOnline">
       <Position>3</Position>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="288" parent="282" name="clientNumbers">
+    <column id="289" parent="282" name="clientNumbers">
       <Position>4</Position>
       <DataType>int(11)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="289" parent="282" name="clientName">
+    <column id="290" parent="282" name="clientName">
       <Position>5</Position>
       <DataType>varchar(45)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="290" parent="282" name="phone">
+    <column id="291" parent="282" name="phone">
       <Position>6</Position>
       <DataType>varchar(15)|0s</DataType>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="291" parent="282" name="serial_UNIQUE">
+    <index id="292" parent="282" name="serial_UNIQUE">
       <ColNames>serial</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
-    <key id="292" parent="282" name="PRIMARY">
+    <key id="293" parent="282" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="293" parent="282" name="serial_UNIQUE">
+    <key id="294" parent="282" name="serial_UNIQUE">
       <ColNames>serial</ColNames>
       <UnderlyingIndexName>serial_UNIQUE</UnderlyingIndexName>
     </key>
-    <column id="294" parent="283" name="id">
+    <column id="295" parent="283" name="id">
       <Position>1</Position>
       <DataType>int(11)|0s</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="295" parent="283" name="ipaddress">
+    <column id="296" parent="283" name="ipaddress">
       <Position>2</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="296" parent="283" name="serial">
+    <column id="297" parent="283" name="serial">
       <Position>3</Position>
       <DataType>varchar(45)|0s</DataType>
-      <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="297" parent="283" name="password">
+    <column id="298" parent="283" name="password">
       <Position>4</Position>
       <DataType>varchar(45)|0s</DataType>
-      <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="298" parent="283" name="time">
+    <column id="299" parent="283" name="time">
       <Position>5</Position>
       <DataType>varchar(45)|0s</DataType>
-      <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="299" parent="283" name="ipaddress_UNIQUE">
-      <ColNames>ipaddress</ColNames>
-      <Unique>1</Unique>
-      <Type>btree</Type>
-    </index>
-    <key id="300" parent="283" name="PRIMARY">
+    <column id="300" parent="283" name="status">
+      <Position>6</Position>
+      <DataType>varchar(45)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="301" parent="283" name="description">
+      <Position>7</Position>
+      <DataType>varchar(200)|0s</DataType>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <key id="302" parent="283" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="301" parent="283" name="ipaddress_UNIQUE">
-      <ColNames>ipaddress</ColNames>
-      <UnderlyingIndexName>ipaddress_UNIQUE</UnderlyingIndexName>
-    </key>
-    <column id="302" parent="284" name="id">
+    <column id="303" parent="284" name="ipaddress">
       <Position>1</Position>
-      <DataType>int(11)|0s</DataType>
+      <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="303" parent="284" name="name">
+    <column id="304" parent="284" name="serial">
       <Position>2</Position>
-      <DataType>varchar(80)|0s</DataType>
-      <NotNull>1</NotNull>
-      <ColumnKind>normal</ColumnKind>
-    </column>
-    <column id="304" parent="284" name="email">
-      <Position>3</Position>
       <DataType>varchar(45)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
     <column id="305" parent="284" name="password">
+      <Position>3</Position>
+      <DataType>varchar(45)|0s</DataType>
+      <NotNull>1</NotNull>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <key id="306" parent="284" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>ipaddress
+serial</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="307" parent="285" name="id">
+      <Position>1</Position>
+      <DataType>int(11)|0s</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="308" parent="285" name="name">
+      <Position>2</Position>
+      <DataType>varchar(80)|0s</DataType>
+      <NotNull>1</NotNull>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="309" parent="285" name="email">
+      <Position>3</Position>
+      <DataType>varchar(45)|0s</DataType>
+      <NotNull>1</NotNull>
+      <ColumnKind>normal</ColumnKind>
+    </column>
+    <column id="310" parent="285" name="password">
       <Position>4</Position>
       <DataType>varchar(200)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <column id="306" parent="284" name="active">
+    <column id="311" parent="285" name="active">
       <Position>5</Position>
       <DataType>varchar(10)|0s</DataType>
       <NotNull>1</NotNull>
       <ColumnKind>normal</ColumnKind>
     </column>
-    <index id="307" parent="284" name="email_UNIQUE">
+    <index id="312" parent="285" name="email_UNIQUE">
       <ColNames>email</ColNames>
       <Unique>1</Unique>
       <Type>btree</Type>
     </index>
-    <key id="308" parent="284" name="PRIMARY">
+    <key id="313" parent="285" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="309" parent="284" name="email_UNIQUE">
+    <key id="314" parent="285" name="email_UNIQUE">
       <ColNames>email</ColNames>
       <UnderlyingIndexName>email_UNIQUE</UnderlyingIndexName>
     </key>

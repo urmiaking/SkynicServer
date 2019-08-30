@@ -17,16 +17,21 @@ public class  ClientManager {
         return instance;
     }
 
-
     public void run(Socket socket) {
         String identity = null;
         String id = null;
+        String temp = socket.getInetAddress().toString();
+        StringBuilder sb = new StringBuilder(temp);
+        sb.deleteCharAt(0);
+        String ipAddress = sb.toString();
         try {
             identity = readLine(socket);
             if (identity == null) {
+                socket.getOutputStream().write("TIMEOUT. Socket is Closed\r\n".getBytes());
                 socket.close();
                 System.out.println("Socket " + socket.getPort() + " Closed");
                 System.out.println("=====================================");
+                DBClass.logFirstTimeOut(ipAddress);
                 return;
             }
             else {
@@ -44,12 +49,14 @@ public class  ClientManager {
                         System.out.println("The Hub is Already Connected!");
                         socket.getOutputStream().write("You are already Connected!\r\n".getBytes());
                         socket.close();
+                        dbClass.logHubAlreadyOnline(ipAddress, id);
                     }
                     else {
                         if (!dbClass.isRegistered()) {
                             System.out.println("This Device is not Registered!");
                             socket.getOutputStream().write("Your Device is not Registered!\r\n".getBytes());
                             socket.close();
+                            dbClass.logHubNotAvailable(ipAddress, id);
                         }
                         else {
                             socket.setSoTimeout(0);
@@ -70,17 +77,21 @@ public class  ClientManager {
                     if (relativeSocketHub != null) {
                         relativeSocketHub.setSocketPhone(socketPhone);
                         socketPhone.getSocket().getOutputStream().write("ENTER PASS\r\n".getBytes());
-                        socketPhone.getSocket().setSoTimeout(60*1000); //If Client Don't Send Pass for a minute, an exception will be raised and Thread will be closed
+                        socketPhone.getSocket().setSoTimeout(10*1000); //If Client Don't Send Pass for a minute, an exception will be raised and Thread will be closed
                         String passSentence = socketPhone.readLine();
+                        if (passSentence == null) {
+                            socketPhone.getSocket().getOutputStream().write("TIMEOUT. Socket is Closed\r\n".getBytes());
+                            socketPhone.getSocket().close();
+                            socket.close();
+                            dbClass.logSecondTimeOut(ipAddress, id);
+                            return;
+                        }
                         String[] passPhrase = passSentence.split("=");
                         if (passPhrase[0].equals("AT+PASS")) {
                             if (!(passPhrase.length < 2 || passPhrase.length > 2)) {
-
                                 String passcode = passPhrase[1];
-                                String ipAddress = socket.getInetAddress().toString();
                                 socketPhone.setPass(passcode);
                                 socketPhone.setSerial(id);
-
                                 relativeSocketHub.write(passSentence + "\r\n", socketPhone);
                                 System.out.println("Message From Phone "+ socket.getPort() + " To Hub "+relativeSocketHub.getSocketHub().getPort()+" :" + passSentence);
                                 socketPhone.getSocket().setSoTimeout(0);
@@ -94,26 +105,31 @@ public class  ClientManager {
                                 socket.getOutputStream().write("Incomplete Password Command. Socket is Closing...\r\n".getBytes());
                                 System.out.println("Incomplete Password Command");
                                 socket.close();
+                                dbClass.logInvalidCommand(ipAddress, id);
                             }
                         } else {
-                            socketPhone.getSocket().getOutputStream().write("Wrong Command. Socket is Closing...\r\n".getBytes());
-                            System.out.println("Wrong Command! Socket " + socket.getPort() + " is Closing...");
+                            socketPhone.getSocket().getOutputStream().write("Invalid Command. Socket is Closing...\r\n".getBytes());
+                            System.out.println("Invalid Command! Socket " + socket.getPort() + " is Closing...");
+                            dbClass.logInvalidCommand(ipAddress, id);
                             socket.close();
                         }
                     }
                     else if (dbClass.isRegistered()) {
                         socketPhone.getSocket().getOutputStream().write("Hub is Offline. Socket is Closing...\r\n".getBytes());
                         System.out.println("Hub " + id + " is Offline");
+                        dbClass.logHubIsOffline(ipAddress, id);
                         socket.close();
                     }
                     else if (relativeSocketHub == null){
                         socketPhone.getSocket().getOutputStream().write("Hub Not Available. Socket is Closing...\r\n".getBytes());
                         System.out.println("Hub " + id + " Not Available");
+                        dbClass.logRequestedHubNotAvailable(ipAddress, id);
                         socket.close();
                     }
                     break;
                 default: socket.getOutputStream().write("Invalid Value. Socket is Closing...\r\n".getBytes());
-                    System.out.println("Wrong Identity by Socket " + socket.getPort());
+                    System.out.println("Invalid Identity by Socket " + socket.getPort());
+                    dbClass.logInvalidCommand(ipAddress, id);
                     socket.close();
             }
             System.out.println("=====================================");
