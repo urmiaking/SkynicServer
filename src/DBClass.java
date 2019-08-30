@@ -1,3 +1,5 @@
+import com.sun.istack.internal.Nullable;
+
 import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -124,7 +126,7 @@ public class DBClass {
             Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
-            String sql = "Select * from my_scheme.tbl_hub where serial="+id;
+            String sql = "Select * from my_scheme.tbl_hub where serial='" + id + "'";
             ResultSet rs = myStmt.executeQuery(sql);
             if (!rs.next()) {
                 myConn.close();
@@ -152,7 +154,7 @@ public class DBClass {
             }
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
-            String sql = "UPDATE my_scheme.tbl_hub SET isOnline=1 WHERE serial="+id;
+            String sql = "UPDATE my_scheme.tbl_hub SET isOnline=1 WHERE serial='" + id + "'";
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -164,7 +166,7 @@ public class DBClass {
             Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
-            String sql = "UPDATE my_scheme.tbl_hub SET isOnline=0 WHERE serial="+id;
+            String sql = "UPDATE my_scheme.tbl_hub SET isOnline=0 WHERE serial='" + id + "'";
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -178,7 +180,7 @@ public class DBClass {
             Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
-            String sql = "UPDATE my_scheme.tbl_hub SET clientNumbers="+number+" WHERE serial="+id;
+            String sql = "UPDATE my_scheme.tbl_hub SET clientNumbers="+number+" WHERE serial='" + id + "'";
             myStmt.executeUpdate(sql);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -193,7 +195,7 @@ public class DBClass {
             int serial = 0;
             Connection myConn = DriverManager.getConnection(url, user, password);
             Statement myStmt = myConn.createStatement();
-            String sql = "SELECT clientNumbers from my_scheme.tbl_hub where serial="+id;
+            String sql = "SELECT clientNumbers from my_scheme.tbl_hub where serial='" + id + "'";
             ResultSet result = myStmt.executeQuery(sql);
             while (result.next()) {
                 serial = result.getInt("clientNumbers");
@@ -500,7 +502,7 @@ public class DBClass {
         }
     }
 
-    public void logSocketHubClosed(String ipAddress, String serial, String pass) {
+    public void logSocketHubClosed(String ipAddress, String serial, @Nullable String pass) {
         try {
             Class.forName(mySqlDriver);
             Connection myConn = DriverManager.getConnection(url, user, password);
@@ -512,9 +514,16 @@ public class DBClass {
             preparedStmt.setString (1, ipAddress);
             preparedStmt.setString (2, serial);
             preparedStmt.setString (3, "Disconnected - Socket HUB Disconnected");
-            preparedStmt.setString (4, "Socket HUB Disconnected  by itself or by connection failure");
+
             preparedStmt.setString (5, timeDate);
-            preparedStmt.setString (6, pass);
+            if (pass == null) {
+                preparedStmt.setString(6, "unknown");
+                preparedStmt.setString (4, "Socket HUB Disconnected  by itself or by connection failure and its password is unknown because no phone connected to it");
+            } else {
+                preparedStmt.setString (6, pass);
+                preparedStmt.setString (4, "Socket HUB Disconnected  by itself or by connection failure");
+            }
+
             preparedStmt.execute();
             myConn.close();
         } catch (SQLException e) {

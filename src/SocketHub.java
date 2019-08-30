@@ -12,6 +12,7 @@ public class SocketHub implements Runnable {
     private SocketPhone socketPhone;
     private String id;
     private String numberOfDevices;
+    private String phonePass;
     private Queue<SocketPhone> socketPhoneQueue = new ArrayDeque<>();
     public ArrayList<SocketPhone> socketPhonesArrays = new ArrayList<>();
 
@@ -56,7 +57,13 @@ public class SocketHub implements Runnable {
                     ClientManager.getInstance().socketHubs.remove(this);
                     dbClass.setOffline();
                     dbClass.setClientNumbers(0);
-                    dbClass.logSocketHubClosed(ipAddress, id, this.socketPhone.getPass());
+                    if (socketPhone == null) {
+                        dbClass.logSocketHubClosed(ipAddress, id, null);
+                    } else {
+                        phonePass = socketPhone.getPass();
+                        dbClass.logSocketHubClosed(ipAddress, id, phonePass);
+                    }
+
                     if (socketPhonesArrays != null) {
                         for (SocketPhone socketPhone : socketPhonesArrays) {
                             socketPhone.getSocket().getOutputStream().write("Hub Disconnected! Disconnecting...\r\n".getBytes());

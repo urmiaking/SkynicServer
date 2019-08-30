@@ -77,7 +77,7 @@ public class  ClientManager {
                     if (relativeSocketHub != null) {
                         relativeSocketHub.setSocketPhone(socketPhone);
                         socketPhone.getSocket().getOutputStream().write("ENTER PASS\r\n".getBytes());
-                        socketPhone.getSocket().setSoTimeout(10*1000); //If Client Don't Send Pass for a minute, an exception will be raised and Thread will be closed
+                        socketPhone.getSocket().setSoTimeout(60*1000); //If Client Don't Send Pass for a minute, an exception will be raised and Thread will be closed
                         String passSentence = socketPhone.readLine();
                         if (passSentence == null) {
                             socketPhone.getSocket().getOutputStream().write("TIMEOUT. Socket is Closed\r\n".getBytes());
