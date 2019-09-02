@@ -5,6 +5,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 
 @SuppressWarnings("ALL")
+/* This class used for access the database. */
 public class DBClass {
 
     private String id;

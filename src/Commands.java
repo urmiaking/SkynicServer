@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 
+/* This class used for checking valid commands. add any desired command to its constructor*/
 public class Commands {
     private ArrayList<String> commands = new ArrayList<>();
 

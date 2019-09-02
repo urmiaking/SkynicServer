@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Queue;
 
 @SuppressWarnings("ALL")
+/* This class used for handling Hub responses*/
 public class SocketHub implements Runnable {
 
     private Socket socketHub;

@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 @SuppressWarnings("ALL")
+/* This class used for handling Phone Clients requests */
 public class SocketPhone implements Runnable {
     private Socket socketPhone;
     private SocketHub socketHub;

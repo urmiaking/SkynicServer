@@ -3,6 +3,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 @SuppressWarnings("ALL")
+/* Main Class which is used for accepting clients*/
 public class Server {
     private static int serverPort;
 

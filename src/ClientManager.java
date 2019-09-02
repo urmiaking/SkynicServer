@@ -3,6 +3,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 @SuppressWarnings("ALL")
+/* This class used for managing and identifying clients and hubs*/
 public class  ClientManager {
 
     public ArrayList<SocketHub> socketHubs = new ArrayList<>();

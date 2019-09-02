@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 @SuppressWarnings("ALL")
+/* This Class Used for Extracting config.properties file and using its key, value pairs*/
 public class PropertyFile {
 
     private static String path = "./config.properties";
